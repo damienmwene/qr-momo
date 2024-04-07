@@ -1,15 +1,20 @@
 pipeline {
     agent any
     
-    environment {
-        SONAR_LOGIN = credentials('sonar-login') // SonarQube login credentials ID
-    }
-    
     stages {
         stage('Checkout') {
             steps {
                 // Checkout the code from your version control system (e.g., Git)
-                git 'https://github.com/your/repository.git'
+                checkout scm
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                // Execute SonarQube analysis
+                withSonarQubeEnv('my_sonar_scanner') {
+                    sh 'mvn sonar:sonar'
+                }
             }
         }
         
@@ -20,14 +25,6 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
-            steps {
-                // Execute SonarQube analysis
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
     }
     
     post {
